@@ -9,7 +9,6 @@ DROP TABLE IF EXISTS Product;
 DROP TABLE IF EXISTS Category;
 DROP TABLE IF EXISTS Warehouse;
 DROP VIEW IF EXISTS OrderSummary;
-DROP VIEW IF EXISTS ProductCatalog;
 DROP VIEW IF EXISTS WarehouseInventory;
 DROP VIEW IF EXISTS SupplierProductCatalog;
 DROP VIEW IF EXISTS CategoryProductCount ;
@@ -182,11 +181,6 @@ CREATE VIEW OrderSummary AS
 SELECT o.order_id, c.first_name, c.last_name, o.order_date, o.order_total
 FROM Customer_Order o
 JOIN Customer c ON o.customer_id = c.customer_id;
-
-CREATE VIEW ProductCatalog AS
-SELECT p.product_id, p.name, p.description, c.name AS category, p.cost, p.price, p.manufacturer, p.reorder_level
-FROM Product p
-JOIN Category c ON p.category_id = c.category_id;
 
 CREATE VIEW WarehouseInventory AS
 SELECT w.warehouse_id, w.name AS warehouse_name, w.address AS warehouse_address, w.phone AS warehouse_phone, w.email AS warehouse_email,

@@ -172,4 +172,20 @@ VALUES
   (2, 2, 2, '2023-05-04', 'Outbound', 1),
   (3, 3, 1, '2023-05-05', 'Inbound', 3);
 
+CREATE VIEW OrderSummary AS
+SELECT o.order_id, c.first_name, c.last_name, o.order_date, o.order_total
+FROM Customer_Order o
+JOIN Customer c ON o.customer_id = c.customer_id;
+
+CREATE VIEW ProductCatalog AS
+SELECT p.product_id, p.name, p.description, c.name AS category, p.cost, p.price, p.manufacturer, p.reorder_level
+FROM Product p
+JOIN Category c ON p.category_id = c.category_id;
+
+CREATE VIEW WarehouseInventory AS
+SELECT w.warehouse_id, w.name AS warehouse_name, w.address AS warehouse_address, w.phone AS warehouse_phone, w.email AS warehouse_email,
+       i.product_id, p.name AS product_name, i.quantity
+FROM Warehouse w
+JOIN Inventory i ON w.warehouse_id = i.warehouse_id
+JOIN Product p ON i.product_id = p.product_id;
 

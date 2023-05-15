@@ -1,3 +1,14 @@
+DROP TABLE IF EXISTS Warehouse_Transaction;
+DROP TABLE IF EXISTS Inventory;
+DROP TABLE IF EXISTS Supplier_Product;
+DROP TABLE IF EXISTS Order_Product;
+DROP TABLE IF EXISTS Customer_Order;
+DROP TABLE IF EXISTS Customer;
+DROP TABLE IF EXISTS Supplier;
+DROP TABLE IF EXISTS Product;
+DROP TABLE IF EXISTS Category;
+DROP TABLE IF EXISTS Warehouse;
+
 CREATE TABLE Product (
   product_id INT NOT NULL PRIMARY KEY,
   name VARCHAR(50) NOT NULL,
@@ -35,7 +46,7 @@ CREATE TABLE Customer_Order (
   order_total DECIMAL(10, 2) NOT NULL,
   CONSTRAINT fk_orders_customers
     FOREIGN KEY (customer_id)
-    REFERENCES customers(customer_id)
+    REFERENCES Customer(customer_id)
 );
 CREATE TABLE Order_Product (
   order_item_id INT NOT NULL PRIMARY KEY,
@@ -45,10 +56,10 @@ CREATE TABLE Order_Product (
   price DECIMAL(10, 2) NOT NULL,
   CONSTRAINT fk_order_items_orders
     FOREIGN KEY (order_id)
-    REFERENCES orders(order_id),
+    REFERENCES Customer_Order(order_id),
   CONSTRAINT fk_order_items_products
     FOREIGN KEY (product_id)
-    REFERENCES products(product_id)
+    REFERENCES Product(product_id)
 );
 CREATE TABLE Supplier_Product (
   supplier_id INT NOT NULL,
@@ -57,10 +68,10 @@ CREATE TABLE Supplier_Product (
     PRIMARY KEY (supplier_id, product_id),
   CONSTRAINT fk_suppliers_products_suppliers
     FOREIGN KEY (supplier_id)
-    REFERENCES suppliers(supplier_id),
+    REFERENCES Supplier(supplier_id),
   CONSTRAINT fk_suppliers_products_products
     FOREIGN KEY (product_id)
-    REFERENCES products(product_id)
+    REFERENCES Product(product_id)
 );
 CREATE TABLE Inventory (
   product_id INT NOT NULL,
@@ -70,30 +81,30 @@ CREATE TABLE Inventory (
     PRIMARY KEY (product_id, warehouse_id),
   CONSTRAINT fk_inventory_products
     FOREIGN KEY (product_id)
-    REFERENCES products(product_id)
+    REFERENCES Product(product_id)
 );
 CREATE TABLE Warehouse (
-  warehouse_id INT NOT NULL PRIMARY KEY,
-  name VARCHAR(50) NOT NULL,
-  address VARCHAR(255) NOT NULL,
-  phone VARCHAR(20),
-  email VARCHAR(50) NOT NULL
+	warehouse_id INT NOT NULL PRIMARY KEY,
+	name VARCHAR(50) NOT NULL,
+	address VARCHAR(255) NOT NULL,
+	phone VARCHAR(20),
+	email VARCHAR(50) NOT NULL
 );
+-- Create Warehouse_Transaction table
 CREATE TABLE Warehouse_Transaction (
-  transaction_id INT NOT NULL PRIMARY KEY,
-  product_id INT NOT NULL,
-  warehouse_id INT NOT NULL,
-  transaction_date DATE NOT NULL,
-  transaction_type VARCHAR(50) NOT NULL,
-  quantity INT NOT NULL,
-  CONSTRAINT fk_transactions_products
-    FOREIGN KEY (product_id)
-    REFERENCES products(product_id),
-  CONSTRAINT fk_transactions_warehouses
-    FOREIGN KEY (warehouse_id)
-    REFERENCES warehouses(warehouse_id)
+	transaction_id INT NOT NULL PRIMARY KEY,
+	product_id INT NOT NULL,
+	warehouse_id INT NOT NULL,
+	transaction_date DATE NOT NULL,
+	transaction_type VARCHAR(50) NOT NULL,
+	quantity INT NOT NULL,
+	CONSTRAINT fk_warehouses_transactions_products
+		FOREIGN KEY (product_id)
+		REFERENCES Product (product_id),
+	CONSTRAINT fk_warehouses_transactions_warehouses
+		FOREIGN KEY (warehouse_id)
+		REFERENCES Warehouse (warehouse_id)
 );
-
 
 -- Inserting dummy data into the Category table
 INSERT INTO Category (category_id, name, description)
@@ -126,38 +137,39 @@ INSERT INTO Warehouse (warehouse_id, name, address, phone, email)
 VALUES
   (1, 'Main Warehouse', '789 Pine Street, City', '555-555-5555', 'warehouse@example.com'),
   (2, 'Secondary Warehouse', '321 Cedar Street, City', '555-888-8888', 'warehouse2@example.com');
-
--- Inserting dummy data into the Customer_Order table
-INSERT INTO Customer_Order (order_id, customer_id, order_date, order_total)
-VALUES
-  (1, 1, '2023-05-01', 199.99),
-  (2, 2, '2023-05-02', 79.99);
-
--- Inserting dummy data into the Order_Product table
-INSERT INTO Order_Product (order_item_id, order_id, product_id, quantity, price)
-VALUES
-  (1, 1, 1, 1, 799.99),
-  (2, 1, 2, 2, 19.99),
-  (3, 2, 3, 1, 79.99);
-
--- Inserting dummy data into the Supplier_Product table
-INSERT INTO Supplier_Product (supplier_id, product_id)
-VALUES
-  (1, 1),
-  (2, 2),
-  (1, 3);
-
+  
 -- Inserting dummy data into the Inventory table
 INSERT INTO Inventory (product_id, warehouse_id, quantity)
 VALUES
   (1, 1, 5),
   (2, 1, 10),
   (3, 2, 8);
-
+  
+-- Inserting dummy data into the Supplier_Product table
+INSERT INTO Supplier_Product (supplier_id, product_id)
+VALUES
+  (1, 1),
+  (2, 2),
+  (1, 3);
+  
+-- Inserting dummy data into the Customer_Order table
+INSERT INTO Customer_Order (order_id, customer_id, order_date, order_total)
+VALUES
+  (1, 1, '2023-05-01', 199.99),
+  (2, 2, '2023-05-02', 79.99);
+  
+  -- Inserting dummy data into the Order_Product table
+INSERT INTO Order_Product (order_item_id, order_id, product_id, quantity, price)
+VALUES
+  (1, 1, 1, 1, 799.99),
+  (2, 1, 2, 2, 19.99),
+  (3, 2, 3, 1, 79.99);
+  
 -- Inserting dummy data into the Warehouse_Transaction table
-INSERT INTO Warehouse_Transaction (transaction_id, product_id, warehouse_id,transaction_date, transaction_type, quantity)
+INSERT INTO Warehouse_Transaction (transaction_id, product_id, warehouse_id, transaction_date, transaction_type, quantity)
 VALUES
   (1, 1, 1, '2023-05-03', 'Inbound', 2),
   (2, 2, 2, '2023-05-04', 'Outbound', 1),
-  (3, 3, 3, '2023-05-05', 'Inbound', 3);
+  (3, 3, 1, '2023-05-05', 'Inbound', 3);
+
 

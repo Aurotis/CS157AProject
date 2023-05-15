@@ -8,6 +8,12 @@ DROP TABLE IF EXISTS Supplier;
 DROP TABLE IF EXISTS Product;
 DROP TABLE IF EXISTS Category;
 DROP TABLE IF EXISTS Warehouse;
+DROP VIEW IF EXISTS OrderSummary;
+DROP VIEW IF EXISTS ProductCatalog;
+DROP VIEW IF EXISTS WarehouseInventory;
+DROP VIEW IF EXISTS SupplierProductCatalog;
+DROP VIEW IF EXISTS CategoryProductCount ;
+DROP VIEW IF EXISTS WarehouseTransactionSummary;
 
 CREATE TABLE Product (
   product_id INT NOT NULL PRIMARY KEY,
@@ -189,3 +195,25 @@ FROM Warehouse w
 JOIN Inventory i ON w.warehouse_id = i.warehouse_id
 JOIN Product p ON i.product_id = p.product_id;
 
+CREATE VIEW SupplierProductCatalog AS
+SELECT p.product_id, p.name AS product_name, p.description, c.name AS category, p.cost, p.price, p.manufacturer, p.reorder_level,
+       s.supplier_id, s.name AS supplier_name, s.address AS supplier_address, s.phone AS supplier_phone, s.email AS supplier_email
+FROM Product p
+JOIN Category c ON p.category_id = c.category_id
+JOIN Supplier_Product sp ON p.product_id = sp.product_id
+JOIN Supplier s ON sp.supplier_id = s.supplier_id;
+
+CREATE VIEW CategoryProductCount AS
+SELECT c.category_id, c.name AS category_name, COUNT(p.product_id) AS product_count
+FROM Category c
+LEFT JOIN Product p ON c.category_id = p.category_id
+GROUP BY c.category_id, c.name;
+
+CREATE VIEW WarehouseTransactionSummary AS
+SELECT wt.warehouse_id, w.name AS warehouse_name, wt.product_id, p.name AS product_name,
+       SUM(CASE WHEN wt.transaction_type = 'Inbound' THEN wt.quantity ELSE 0 END) AS total_inbound,
+       SUM(CASE WHEN wt.transaction_type = 'Outbound' THEN wt.quantity ELSE 0 END) AS total_outbound
+FROM Warehouse_Transaction wt
+JOIN Warehouse w ON wt.warehouse_id = w.warehouse_id
+JOIN Product p ON wt.product_id = p.product_id
+GROUP BY wt.warehouse_id, w.name, wt.product_id, p.name;
